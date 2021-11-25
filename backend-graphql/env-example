@@ -1,0 +1,8 @@
+NODE_ENV=development
+APP_DB_HOST=local_hospital
+APP_DB_PORT=3306
+APP_DB_NAME=projeto-final
+APP_DB_USER=root
+APP_DB_PASS=
+
+APP_AUTH_SECRET=segredo

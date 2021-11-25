@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt-nodejs')
 const db = require('../../config/db')
 
 function usuario_perfil(perfil_insert, usuario) {
@@ -20,21 +21,36 @@ function usuario_perfil(perfil_insert, usuario) {
     })
 }
 
-module.exports = {
+const mutations = {
+    async registrarUsuario(_, { dados }) {
+        return mutations.novoUsuario(_, {
+            dados: {
+                nome: dados.nome,
+                email: dados.email,
+                senha: dados.senha
+            }
+        })
+    },
     async novoUsuario(_, { dados }) {
-        const { nome, email, senha, perfis } = dados
+        const { nome, email } = dados
         let usuario = await db('usuarios').where({ email }).first()
         if(!usuario){
-            await db('usuarios').insert( { nome, email, senha } )
+            const salt = bcrypt.genSaltSync()
+            dados.senha = bcrypt.hashSync(dados.senha, salt)
+
+            await db('usuarios').insert( { nome, email, senha: dados.senha } )
             usuario = await db('usuarios').where({ email }).first()
 
-            if(perfis){
-                usuario['perfis'] = []
-                for(perfil_insert of perfis){
-                    await usuario_perfil(perfil_insert, usuario).then(perfil => {
-                        usuario['perfis'].push(perfil)
-                    })
-                }
+            if(!dados.perfis || !dados.perfis.length){
+                dados.perfis = [{
+                    nome: 'comum'
+                }]
+            }
+            usuario['perfis'] = []
+            for(perfil_insert of dados.perfis){
+                await usuario_perfil(perfil_insert, usuario).then(perfil => {
+                    usuario['perfis'].push(perfil)
+                })
             }
         }else{
             throw new Error('Usuario ja existe!')
@@ -68,6 +84,11 @@ module.exports = {
         }
 
         if(usuario){
+            if(dados.senha){
+                const salt = bcrypt.genSaltSync()
+                dados.senha = bcrypt.hashSync(dados.senha, salt)
+            }
+
             await db('usuarios')
                 .update({ nome: usuario.nome, email: usuario.email, senha: usuario.senha, 
                     nome, email, senha })
@@ -91,3 +112,5 @@ module.exports = {
         }
     }
 }
+
+module.exports = mutations
