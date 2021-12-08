@@ -2,7 +2,9 @@ const db = require('../../config/db')
 const { perfil: get_perfil } = require('../Query/perfil')
 
 module.exports = {
-    async novoPerfil(_, { dados }) {
+    async novoPerfil(_, { dados }, ctx) {
+        ctx && ctx.validarAdmin()
+
         const { nome, rotulo } = dados
         let perfil = await db('perfis').where({ nome }).first()
         if(!perfil){
@@ -13,7 +15,9 @@ module.exports = {
         }
         return perfil
     },
-    async excluirPerfil(_, { filtro }) {
+    async excluirPerfil(_, { filtro }, ctx) {
+        ctx && ctx.validarAdmin()
+
         const { id, nome } = filtro
         let perfil = await get_perfil(_, { filtro })
         if(perfil){
@@ -24,7 +28,9 @@ module.exports = {
             throw new Error('Perfil não existe!')
         }
     },
-    async alterarPerfil(_, { filtro, dados }) {
+    async alterarPerfil(_, { filtro, dados }, ctx) {
+        ctx && ctx.validarAdmin()
+        
         const { nome, rotulo } = dados
         let perfil = null
         if(filtro.id){

@@ -22,11 +22,12 @@ module.exports = {
         return getUsuarioLogado(usuario)
     },
     async usuarios(obj, args, ctx) {
-        console.log(ctx.texto);
-        console.log(ctx.imprimir);
+        ctx && ctx.validarAdmin()
         return db('usuarios')
     },
-    async usuario(_, { filtro }) {
+    async usuario(_, { filtro }, ctx) {
+        ctx && ctx.validarUsuarioFiltro(filtro)
+
         const { id, email } = filtro
 
         if(id){

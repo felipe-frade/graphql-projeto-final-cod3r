@@ -31,7 +31,9 @@ const mutations = {
             }
         })
     },
-    async novoUsuario(_, { dados }) {
+    async novoUsuario(_, { dados }, ctx) {
+        ctx && ctx.validarAdmin()
+
         const { nome, email } = dados
         let usuario = await db('usuarios').where({ email }).first()
         if(!usuario){
@@ -57,7 +59,9 @@ const mutations = {
         }
         return usuario
     },
-    async excluirUsuario(_, { filtro }) {
+    async excluirUsuario(_, { filtro }, ctx) {
+        ctx && ctx.validarAdmin()
+        
         const { id, email } = filtro
         let usuario = null
         if(id){
@@ -74,7 +78,9 @@ const mutations = {
             throw new Error('Perfil não existe!')
         }
     },
-    async alterarUsuario(_, { filtro, dados }) {
+    async alterarUsuario(_, { filtro, dados }, ctx) {
+        ctx && ctx.validarUsuarioFiltro(filtro)
+
         const { nome, email, senha, perfis} = dados
         let usuario = null
         if(filtro.id){
@@ -94,7 +100,7 @@ const mutations = {
                     nome, email, senha })
                 .where({ id: filtro.id })
 
-            if(perfis){
+            if(ctx.admin && perfis){
                 usuario['perfis'] = []
 
                 if(perfis.length > 0){
