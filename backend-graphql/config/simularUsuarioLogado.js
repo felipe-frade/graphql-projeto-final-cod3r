@@ -20,7 +20,7 @@ const getUsuario = async nomePerfil => {
 }
 
 module.exports = async req => {
-    const usuario = await getUsuario('comum')
+    const usuario = await getUsuario('admin')
     if(usuario){
         const { token } = await getUsuarioLogado(usuario)
         req.headers = {

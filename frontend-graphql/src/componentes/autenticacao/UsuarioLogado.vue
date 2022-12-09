@@ -2,6 +2,10 @@
     <v-card v-if="usuario" class="ma-3 pa-2">
         <v-layout fill-height align-center>
             <v-flex>
+                <span class="ml-3 headline"><strong>ID: </strong></span>
+                <span class="headline blue--text text--darken-2">
+                    {{ usuario.id }}</span>
+
                 <span class="ml-3 headline"><strong>Nome: </strong></span>
                 <span class="headline blue--text text--darken-2">
                     {{ usuario.nome }}</span>
@@ -34,7 +38,7 @@ export default {
         ...mapGetters(['usuario']),
         perfis() {
             if(!this.usuario && !this.usuario.perfis) return null
-            return this.usuario.perfis.map(p => p.nome).join(', ')
+            return this.usuario.perfis.map(p => p.rotulo).join(', ')
         }
     },
     methods: mapActions(['setUsuario'])

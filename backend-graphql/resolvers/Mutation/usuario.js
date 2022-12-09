@@ -96,9 +96,9 @@ const mutations = {
             }
 
             await db('usuarios')
-                .update({ nome: usuario.nome, email: usuario.email, senha: usuario.senha, 
+                .update({ nome: nome, nome: usuario.nome, email: usuario.email, senha: usuario.senha, 
                     nome, email, senha })
-                .where({ id: filtro.id })
+                .where({ id: usuario.id })
 
             if(ctx.admin && perfis){
                 usuario['perfis'] = []

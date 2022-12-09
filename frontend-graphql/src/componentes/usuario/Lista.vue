@@ -20,7 +20,7 @@
                         <td>{{ props.item.nome }}</td>
                         <td>{{ props.item.email }}</td>
                         <td>{{ props.item.perfis
-                                .map(p => p.nome)
+                                .map(p => p.rotulo)
                                 .join(', ') }}</td>
                     </template>
                 </v-data-table>
@@ -31,6 +31,7 @@
 
 <script>
 import Erros from '../comum/Erros'
+import gql from 'graphql-tag'
 
 export default {
     components: { Erros },
@@ -48,7 +49,21 @@ export default {
     },
     methods: {
         obterUsuarios() {
-            // 
+            this.$api.query({
+                query: gql`{ 
+                    usuarios{
+                        id nome email perfis { rotulo nome }
+                    }
+                }`,
+                fetchPolicy: 'network-only'
+            }).then((res) => {
+                this.usuarios = []
+                this.usuarios = res.data.usuarios
+                this.erros = null
+            }).catch(e => {
+                this.usuarios = []
+                this.erros = e
+            })
         }
     }
 }

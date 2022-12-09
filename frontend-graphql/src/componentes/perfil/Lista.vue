@@ -28,6 +28,7 @@
 
 <script>
 import Erros from '../comum/Erros'
+import gql from 'graphql-tag'
 
 export default {
     components: { Erros },
@@ -44,7 +45,19 @@ export default {
     },
     methods: {
         obterPerfis() {
-            // implementar
+            this.$api.query({
+                query: gql` query{
+                        perfis {
+                            id nome rotulo
+                        }
+                    }
+                `
+            }).then(res => {
+                this.perfis = res.data.perfis
+                this.erros = null
+            }).catch(e => {
+                this.erros = e
+            })
         }
     }
 }

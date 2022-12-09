@@ -60,6 +60,7 @@
 
 <script>
 import Erros from '../comum/Erros'
+import gql from 'graphql-tag'
 
 export default {
     components: { Erros },
@@ -87,10 +88,55 @@ export default {
     },
     methods: {
         alterarUsuario() {
-            // Implementar
+            this.$api.mutate({
+                mutation: gql`
+                    mutation(
+                        $id: Int
+                        $email_filtro: String
+                        $email: String
+                        $senha: String
+                        $nome: String
+                        $perfis: [PerfilFiltro]
+                    ){
+                        alterarUsuario(
+                            filtro: { id: $id, email: $email_filtro }
+                            dados: {
+                                nome: $nome
+                                email: $email
+                                senha: $senha
+                                perfis: $perfis
+                            }
+                        ){
+                            id nome email perfis { nome rotulo }
+                        }
+                    }
+                `,
+                variables: {
+                    id: this.filtro.id,
+                    email_filtro: this.filtro.email,
+                    nome: this.usuario.nome,
+                    email: this.usuario.email,
+                    senha: this.usuario.senha,
+                    perfis: this.perfisSelecionados
+                }
+            }).then(res => {
+                this.dados = res.data.alterarUsuario
+                this.erros = null
+                this.filtro = {}
+                this.usuario = {}
+            }).catch(e => {
+                this.erros = e
+            })
         },
         obterPerfis() {
-            // implementar
+            this.$api.query({
+                query: gql`{ perfis { id rotulo } }`
+            }).then((res) => {
+                this.perfis = res.data.perfis
+                // this.erros = null
+            }).catch(e => {
+                this.erros = e
+            })
         }
     }
 }

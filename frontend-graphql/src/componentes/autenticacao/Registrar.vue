@@ -42,6 +42,7 @@
 
 <script>
 import Erros from '../comum/Erros'
+import gql from 'graphql-tag'
 
 export default {
     components: { Erros },
@@ -60,7 +61,39 @@ export default {
     },
     methods: {
         registrar() {
-            // implementar
+            this.$api.mutate({
+                mutation: gql`
+                    mutation (
+                        $nome: String!
+                        $email: String!
+                        $senha: String!
+                    ){ 
+                        registrarUsuario(
+                            dados: {
+                                nome: $nome
+                                email: $email
+                                senha: $senha
+                            }
+                        ){
+                            id
+                            nome
+                            email
+                            perfis { nome }
+                        }
+                    }
+                `,
+                variables: {
+                    nome: this.usuario.nome,
+                    email: this.usuario.email,
+                    senha: this.usuario.senha
+                }
+            }).then((res) => {
+                this.dados = res.data.registrarUsuario
+                this.usuario = {}
+                this.erros = null
+            }).catch(e => {
+                this.erros = e
+            })
         }
     }
 }

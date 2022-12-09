@@ -40,7 +40,7 @@ module.exports = {
         }
 
         if(perfil){
-            await db('perfis').update({ ...perfil, nome, rotulo }).where({ id: filtro.id })
+            await db('perfis').update({ ...perfil, nome, rotulo }).where({ id: perfil.id })
 
             return await db('perfis').where({ id: perfil.id }).first()
         }else{
